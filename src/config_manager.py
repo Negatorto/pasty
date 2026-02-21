@@ -3,7 +3,9 @@ import os
 
 class ConfigManager:
     def __init__(self):
-        self.config_file = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "config.json")
+        config_dir = os.path.expanduser("~/.config/pasty")
+        os.makedirs(config_dir, exist_ok=True)
+        self.config_file = os.path.join(config_dir, "config.json")
         self.config = {}
         self.load()
 

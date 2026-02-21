@@ -3,6 +3,7 @@ gi.require_version('Gtk', '4.0')
 gi.require_version('Adw', '1')
 from gi.repository import Gtk, Gdk, Gio, GLib, GObject, Adw
 import time
+import os
 
 class HistoryWindow(Adw.Window):
     def __init__(self, clipboard_manager):
@@ -11,6 +12,11 @@ class HistoryWindow(Adw.Window):
         self.set_default_size(320, 450)
         self.set_modal(True)
         self.set_resizable(False)  # Prevents tiling WMs from resizing
+
+        # Set icon
+        # icon_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "data", "pasty.png")
+        # if os.path.exists(icon_path):
+        #     self.set_icon_from_file(icon_path)
 
         # Main Layout: Toolbar View
         toolbar_view = Adw.ToolbarView()

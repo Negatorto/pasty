@@ -14,7 +14,9 @@ class ClipboardManager(GObject.Object):
         super().__init__()
         self.config_manager = config_manager
         self.history = []
-        self.history_file = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "history.json")
+        data_dir = os.path.expanduser("~/.local/share/pasty")
+        os.makedirs(data_dir, exist_ok=True)
+        self.history_file = os.path.join(data_dir, "history.json")
         self.load_history()
         
         self.clipboard = Gdk.Display.get_default().get_clipboard()
@@ -42,7 +44,7 @@ class ClipboardManager(GObject.Object):
     def on_read_text_finish(self, clipboard, result, data):
         try:
             text = clipboard.read_text_finish(result)
-            if text:
+            if text is not None and text.strip():
                 self.add_to_history(text)
         except Exception as e:
             print(f"Error reading clipboard: {e}")

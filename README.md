@@ -36,7 +36,7 @@ Designed to integrate perfectly with the GNOME desktop environment on Linux.
     ```bash
     python3 -m venv venv
     source venv/bin/activate
-    pip install -r src/requirements.txt
+    pip install -r requirements.txt
     ```
 
 ## 🔄 Autostart (Run in Background)
