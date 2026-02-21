@@ -104,7 +104,9 @@ class HistoryWindow(Adw.Window):
             except Exception as e:
                 print(f"Error setting clipboard: {e}")
             
-            self.close()
+            # Delay closing window slightly to ensure Wayland has time
+            # to complete the clipboard IPC transfer.
+            GLib.timeout_add(150, self.close)
 
     def on_key_pressed(self, controller, keyval, keycode, state):
         if keyval == Gdk.KEY_Escape:

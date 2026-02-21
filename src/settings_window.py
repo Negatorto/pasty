@@ -80,4 +80,9 @@ class SettingsWindow(Adw.PreferencesWindow):
     def on_size_changed(self, spin, config_manager):
         value = int(spin.get_value())
         config_manager.set("history_size", value)
+        
+        # Access clipboard_manager from parent to enforce the new limit immediately
+        parent = self.get_transient_for()
+        if parent and hasattr(parent, 'clipboard_manager'):
+            parent.clipboard_manager.enforce_size_limit()
 
