@@ -9,8 +9,12 @@ Designed to integrate perfectly with the GNOME desktop environment on Linux.
 
 * **Native Design:** Polished interface that follows GNOME Human Interface Guidelines (Libadwaita).
 * **Persistent History:** Keeps your clipboard history safe even after a restart.
+* **Pinned Items 📌:** Pin your favorite clips to the top so they are never purged.
+* **Instant Search 🔍:** Type-to-search to quickly filter your clipboard history.
+* **Keyboard-first Workflow:** Navigate with `Arrow keys`, copy with `Enter` or `Alt+1..9`, pin with `Ctrl+P`, delete with `Del`.
+* **Clear All 🗑️:** Clear your regular history with one click while keeping pinned items.
 * **Smart:** Automatically ignores duplicates and identical consecutive copies.
-* **Global Shortcut:** Integrates seamlessly with system custom shortcuts.
+* **Global Shortcut:** Integrates seamlessly with system custom shortcuts (e.g. `Super+V`).
 * **Configurable:** You decide how many items to keep in memory.
 
 ## 🛠️ Requirements
@@ -32,12 +36,12 @@ Designed to integrate perfectly with the GNOME desktop environment on Linux.
     sudo dnf install python3-gobject gtk4 libadwaita python3-pip
     ```
 
-3.  **Create a virtual environment and install Python packages:**
+2.  **optzional: Create a virtual environment and install Python packages:**
     ```bash
     python3 -m venv venv
     source venv/bin/activate
-    pip install -r requirements.txt
     ```
+
 
 ## 🔄 Autostart (Run in Background)
 
