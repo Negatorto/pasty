@@ -1,3 +1,4 @@
+import os
 import time
 import gi
 gi.require_version('Gtk', '4.0')
@@ -28,6 +29,11 @@ class HistoryWindow(Adw.Window):
         header = Adw.HeaderBar()
         self.window_title = Adw.WindowTitle(title="Pasty", subtitle=_("app_subtitle_default"))
         header.set_title_widget(self.window_title)
+
+        # App Icon in Header
+        app_icon = self._build_header_icon()
+        if app_icon:
+            header.pack_start(app_icon)
 
         # Filter Pinned Toggle Button (Start)
         self.pin_filter_btn = Gtk.ToggleButton(icon_name="view-pin-symbolic")
@@ -105,6 +111,18 @@ class HistoryWindow(Adw.Window):
         self.connect('close-request', self.on_close_request)
         self.clipboard_manager.connect('history-changed', self.on_history_changed)
         self.refresh_list()
+
+    def _build_header_icon(self):
+        project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        icon_path = os.path.join(project_root, "data", "pasty.png")
+        if os.path.exists(icon_path):
+            img = Gtk.Image.new_from_file(icon_path)
+            img.set_pixel_size(24)
+            img.set_margin_start(4)
+            img.set_margin_end(2)
+            img.set_valign(Gtk.Align.CENTER)
+            return img
+        return None
 
     def _apply_custom_css(self):
         css_provider = Gtk.CssProvider()

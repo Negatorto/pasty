@@ -8,7 +8,7 @@ os.environ.setdefault("GDK_BACKEND", "x11")
 import gi
 gi.require_version('Gtk', '4.0')
 gi.require_version('Adw', '1')
-from gi.repository import Gio, Adw
+from gi.repository import Gio, Adw, Gtk, Gdk
 
 from config_manager import ConfigManager
 from clipboard_manager import ClipboardManager
@@ -31,10 +31,22 @@ class PastyApp(Adw.Application):
 
     def on_startup(self, app):
         self.hold()
+        self._register_app_icon()
         self.config_manager = ConfigManager()
         self.clipboard_manager = ClipboardManager(self.config_manager)
         self.win = HistoryWindow(self.clipboard_manager)
         self.win.set_application(self)
+
+    def _register_app_icon(self):
+        project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        icon_path = os.path.join(project_root, "data", "pasty.png")
+        if os.path.exists(icon_path):
+            display = Gdk.Display.get_default()
+            if display:
+                icon_theme = Gtk.IconTheme.get_for_display(display)
+                icon_theme.add_search_path(os.path.join(project_root, "data"))
+                icon_theme.add_resource_path(os.path.join(project_root, "data"))
+
 
     def on_command_line(self, app, command_line):
         args = command_line.get_arguments()

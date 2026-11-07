@@ -3,7 +3,11 @@
 A modern, simple, and lightweight clipboard manager written in Python, GTK4, and Libadwaita.
 Designed to integrate cleanly with the GNOME desktop environment on Linux.
 
-![Pasty Screenshot](screenshot/screenshot.png)
+<p align="center">
+  <img src="screenshot/Screenshot-1.png" alt="Pasty Empty State" width="45%" />
+  &nbsp;
+  <img src="screenshot/Screenshot-2.png" alt="Pasty With Clips" width="45%" />
+</p>
 
 ## Features
 
