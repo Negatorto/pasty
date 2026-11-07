@@ -4,6 +4,8 @@ gi.require_version('Gtk', '4.0')
 gi.require_version('Adw', '1')
 from gi.repository import Gtk, Gdk, GLib, Adw, Pango
 
+from i18n import _
+
 
 class HistoryWindow(Adw.Window):
     def __init__(self, clipboard_manager):
@@ -24,25 +26,24 @@ class HistoryWindow(Adw.Window):
 
         # Header Bar
         header = Adw.HeaderBar()
-        self.window_title = Adw.WindowTitle(title="Pasty", subtitle="Cronologia appunti")
+        self.window_title = Adw.WindowTitle(title="Pasty", subtitle=_("app_subtitle_default"))
         header.set_title_widget(self.window_title)
 
         # Filter Pinned Toggle Button (Start)
-        self.pin_filter_btn = Gtk.ToggleButton()
-        self._set_button_icon_or_label(self.pin_filter_btn, "view-pin-symbolic", "📌")
-        self.pin_filter_btn.set_tooltip_text("Mostra solo elementi fissati")
+        self.pin_filter_btn = Gtk.ToggleButton(icon_name="view-pin-symbolic")
+        self.pin_filter_btn.set_tooltip_text(_("tooltip_show_pinned"))
         self.pin_filter_btn.connect("toggled", self.on_pin_filter_toggled)
         header.pack_start(self.pin_filter_btn)
 
         # Settings Button (End)
         settings_btn = Gtk.Button(icon_name="emblem-system-symbolic")
-        settings_btn.set_tooltip_text("Impostazioni")
+        settings_btn.set_tooltip_text(_("tooltip_settings"))
         settings_btn.connect('clicked', self.on_settings_clicked)
         header.pack_end(settings_btn)
 
         # Clear All Button (End)
         self.clear_btn = Gtk.Button(icon_name="user-trash-symbolic")
-        self.clear_btn.set_tooltip_text("Cancella cronologia (mantiene i fissati)")
+        self.clear_btn.set_tooltip_text(_("tooltip_clear_history"))
         self.clear_btn.connect('clicked', self.on_clear_clicked)
         header.pack_end(self.clear_btn)
 
@@ -56,7 +57,7 @@ class HistoryWindow(Adw.Window):
         search_box.set_margin_bottom(6)
 
         self.search_entry = Gtk.SearchEntry()
-        self.search_entry.set_placeholder_text("Cerca negli appunti... (digita per filtrare)")
+        self.search_entry.set_placeholder_text(_("search_placeholder"))
         self.search_entry.set_hexpand(True)
         self.search_entry.connect("search-changed", self.on_search_changed)
         search_box.append(self.search_entry)
@@ -89,8 +90,8 @@ class HistoryWindow(Adw.Window):
         # Empty State
         self.empty_status = Adw.StatusPage()
         self.empty_status.set_icon_name("edit-paste-symbolic")
-        self.empty_status.set_title("Nessun elemento")
-        self.empty_status.set_description("Copia del testo con Ctrl+C per salvarlo qui.")
+        self.empty_status.set_title(_("empty_history_title"))
+        self.empty_status.set_description(_("empty_history_desc"))
         self.stack.add_named(self.empty_status, "empty")
 
         toolbar_view.set_content(self.stack)
@@ -133,29 +134,20 @@ class HistoryWindow(Adw.Window):
             Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION,
         )
 
-    def _set_button_icon_or_label(self, button, icon_name, fallback_label):
-        display = Gdk.Display.get_default()
-        if display:
-            theme = Gtk.IconTheme.get_for_display(display)
-            if theme.has_icon(icon_name):
-                button.set_icon_name(icon_name)
-                return
-        button.set_label(fallback_label)
-
     def _format_relative_time(self, timestamp):
         if not timestamp:
             return ""
         diff = max(0, int(time.time() - timestamp))
         if diff < 45:
-            return "Adesso"
+            return _("time_now")
         if diff < 3600:
-            return f"{diff // 60}m fa"
+            return _("time_mins_ago", n=diff // 60)
         if diff < 86400:
-            return f"{diff // 3600}h fa"
+            return _("time_hours_ago", n=diff // 3600)
         days = diff // 86400
         if days == 1:
-            return "Ieri"
-        return f"{days}g fa"
+            return _("time_yesterday")
+        return _("time_days_ago", n=days)
 
     def open_window(self):
         self.search_entry.set_text("")
@@ -195,11 +187,11 @@ class HistoryWindow(Adw.Window):
         unpinned_count = total_count - pinned_count
 
         if total_count == 0:
-            self.window_title.set_subtitle("Cronologia vuota")
+            self.window_title.set_subtitle(_("app_subtitle_empty"))
         elif pinned_count > 0:
-            self.window_title.set_subtitle(f"{total_count} elementi • {pinned_count} fissati")
+            self.window_title.set_subtitle(_("app_subtitle_counts", total=total_count, pinned=pinned_count))
         else:
-            self.window_title.set_subtitle(f"{total_count} elementi")
+            self.window_title.set_subtitle(_("app_subtitle_counts_single", total=total_count))
 
         self.clear_btn.set_sensitive(unpinned_count > 0)
 
@@ -213,14 +205,14 @@ class HistoryWindow(Adw.Window):
 
         if not self._filtered_indices:
             if query:
-                self.empty_status.set_title("Nessun risultato")
-                self.empty_status.set_description(f"Nessun appunto contiene \"{self.search_entry.get_text().strip()}\".")
+                self.empty_status.set_title(_("empty_search_title"))
+                self.empty_status.set_description(_("empty_search_desc", query=self.search_entry.get_text().strip()))
             elif self._only_pinned:
-                self.empty_status.set_title("Nessun elemento fissato")
-                self.empty_status.set_description("Usa l'icona 📌 su un appunto per fissarlo in alto.")
+                self.empty_status.set_title(_("empty_pinned_title"))
+                self.empty_status.set_description(_("empty_pinned_desc"))
             else:
-                self.empty_status.set_title("Cronologia vuota")
-                self.empty_status.set_description("Copia del testo con Ctrl+C per ritrovarlo qui.")
+                self.empty_status.set_title(_("empty_history_title"))
+                self.empty_status.set_description(_("empty_history_desc"))
             self.stack.set_visible_child_name("empty")
             return
 
@@ -243,7 +235,7 @@ class HistoryWindow(Adw.Window):
 
             time_str = self._format_relative_time(timestamp)
             if is_pinned:
-                meta_text = f"📌 Fissato • {time_str}" if time_str else "📌 Fissato"
+                meta_text = _("meta_pinned_with_time", time=time_str) if time_str else _("meta_pinned")
             else:
                 meta_text = time_str
 
@@ -258,15 +250,14 @@ class HistoryWindow(Adw.Window):
                 top_row.append(shortcut_lbl)
 
             # Pin Button
-            pin_btn = Gtk.Button()
-            self._set_button_icon_or_label(pin_btn, "view-pin-symbolic", "📌")
+            pin_btn = Gtk.Button(icon_name="view-pin-symbolic")
             pin_btn.add_css_class("flat")
             pin_btn.add_css_class("circular")
             if is_pinned:
                 pin_btn.add_css_class("pasty-pin-active")
-                pin_btn.set_tooltip_text("Rimuovi dai fissati (Ctrl+P)")
+                pin_btn.set_tooltip_text(_("tooltip_unpin"))
             else:
-                pin_btn.set_tooltip_text("Fissa in alto (Ctrl+P)")
+                pin_btn.set_tooltip_text(_("tooltip_pin"))
             pin_btn.connect("clicked", self.on_pin_clicked, orig_idx)
             top_row.append(pin_btn)
 
@@ -274,15 +265,15 @@ class HistoryWindow(Adw.Window):
             del_btn = Gtk.Button(icon_name="window-close-symbolic")
             del_btn.add_css_class("flat")
             del_btn.add_css_class("circular")
-            del_btn.set_tooltip_text("Elimina (Canc)")
+            del_btn.set_tooltip_text(_("tooltip_delete"))
             del_btn.connect("clicked", self.on_delete_clicked, orig_idx)
             top_row.append(del_btn)
 
             card_box.append(top_row)
 
-            # Multi-line text preview (up to 3 lines like Windows 11 Win+V)
+            # Multi-line text preview (up to 3 lines)
             lines = [line.strip() for line in text.splitlines() if line.strip()]
-            preview_text = "\n".join(lines[:3]) if lines else "<Vuoto>"
+            preview_text = "\n".join(lines[:3]) if lines else _("empty_clip")
             if len(preview_text) > 240:
                 preview_text = preview_text[:240] + "…"
 
@@ -332,7 +323,6 @@ class HistoryWindow(Adw.Window):
         new_row = self.list_box.get_row_at_index(new_idx)
         if new_row:
             self.list_box.select_row(new_row)
-            # Scroll row into view if needed
             adj = self.scrolled.get_vadjustment()
             if adj:
                 alloc = new_row.get_allocation()
@@ -370,13 +360,11 @@ class HistoryWindow(Adw.Window):
                 self._activate_visible_row(selected.get_index())
             return True
 
-        # Alt+1 .. Alt+9 quick selection
         if modifiers == Gdk.ModifierType.ALT_MASK and Gdk.KEY_1 <= keyval <= Gdk.KEY_9:
             idx = keyval - Gdk.KEY_1
             self._activate_visible_row(idx)
             return True
 
-        # Ctrl+P to pin/unpin selected item
         if modifiers == Gdk.ModifierType.CONTROL_MASK and keyval in (Gdk.KEY_p, Gdk.KEY_P):
             selected = self.list_box.get_selected_row()
             if selected and 0 <= selected.get_index() < len(self._filtered_indices):
@@ -384,7 +372,6 @@ class HistoryWindow(Adw.Window):
                 self.clipboard_manager.toggle_pin(orig_idx)
             return True
 
-        # Delete item when pressing Delete (if search entry is empty) or Ctrl+Delete
         if keyval == Gdk.KEY_Delete and (
             not self.search_entry.get_text() or modifiers == Gdk.ModifierType.CONTROL_MASK
         ):
@@ -393,7 +380,6 @@ class HistoryWindow(Adw.Window):
                 vis_idx = selected.get_index()
                 orig_idx = self._filtered_indices[vis_idx]
                 self.clipboard_manager.delete_item(orig_idx)
-                # Keep selection near the deleted item
                 next_idx = min(vis_idx, len(self._filtered_indices) - 1)
                 if next_idx >= 0:
                     row = self.list_box.get_row_at_index(next_idx)
@@ -407,4 +393,5 @@ class HistoryWindow(Adw.Window):
         from settings_window import SettingsWindow
         win = SettingsWindow(self)
         win.present()
+
 
